@@ -1,0 +1,142 @@
+openapi: 3.0.0
+info:
+  title: Gestión de Cuentas API
+  version: 1.0.0
+  description: API para gestionar cuentas
+
+/cuentas:
+  get:
+    summary: Listar todas las cuentas bancarias
+    description: Recupera una lista de todas las cuentas bancarias
+    responses:
+      '200':
+        description: Lista de cuentas
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CuentaBancaria'
+
+  post:
+    summary: Crear una nueva cuenta bancaria
+    description: Crear una cuenta bancaria para un cliente específico
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CuentaBancaria'
+    responses:
+      '201':
+        description: Cuenta creada exitosamente
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CuentaBancaria'
+      '400':
+        description: Error de validación (Saldo inicial y tipo de cuenta no cumplen con los requisitos)
+
+  /cuentas/{id}:
+    get:
+      summary: Obtener una cuenta bancaria por ID
+      description: Recupera los detalles de una cuenta bancaria específica por su ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID de la cuenta bancaria
+      responses:
+        '200':
+          description: Cuenta encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CuentaBancaria'
+        '404':
+          description: Cuenta no encontrada
+
+    put:
+      summary: Actualizar cuenta bancaria
+      description: Actualiza los detalles de una cuenta bancaria
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID de la cuenta bancaria a actualizar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CuentaBancaria'
+      responses:
+        '200':
+          description: Cuenta actualizada
+        '400':
+          description: Error de validación (Saldo o sobregiro no permitidos)
+        '404':
+          description: Cuenta no encontrada
+
+    delete:
+      summary: Eliminar cuenta bancaria
+      description: Elimina una cuenta bancaria específica por su ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID de la cuenta bancaria a eliminar
+      responses:
+        '204':
+          description: Cuenta eliminada
+        '404':
+          description: Cuenta no encontrada
+
+
+components:
+  schemas:
+
+    CuentaBancaria:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identificador único de la cuenta bancaria
+        numeroCuenta:
+          type: string
+          description: Número de cuenta único
+        saldo:
+          type: number
+          format: double
+          description: Saldo inicial de la cuenta bancaria (debe ser mayor a 0)
+        tipoCuenta:
+          type: string
+          enum:
+            - AHORROS
+            - CORRIENTE
+          description: Tipo de cuenta (AHORROS o CORRIENTE)
+        clienteId:
+          type: integer
+          description: ID del cliente propietario de la cuenta bancaria
+      required:
+        - numeroCuenta
+        - saldo
+        - tipoCuenta
+        - clienteId
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
