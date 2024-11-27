@@ -46,14 +46,17 @@ public class AccountController {
     @PutMapping("/accounts/{id}")
     public ResponseEntity<ResponseDto> updateAccount(@PathVariable String id, @RequestBody AccountDto accountDto) {
         boolean isUpdated = accountService.updateAccount(accountDto);
-        if(isUpdated) {
+
+        if (isUpdated) {
+            ResponseDto responseDto = new ResponseDto("200", "Client updated successfully");
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new ResponseDto(AccountConstants.STATUS_200, AccountConstants.MESSAGE_200));
-        }else{
+                    .body(responseDto);
+        } else {
+            ResponseDto responseDto = new ResponseDto("417", "Failed to update client");
             return ResponseEntity
                     .status(HttpStatus.EXPECTATION_FAILED)
-                    .body(new ResponseDto(AccountConstants.STATUS_417, AccountConstants.MESSAGE_417_UPDATE));
+                    .body(responseDto);
         }
 
     }

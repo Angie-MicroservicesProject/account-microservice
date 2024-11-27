@@ -2,9 +2,7 @@ package com.example.ms.ms_account.repository;
 
 
 import com.example.ms.ms_account.model.entity.Account;
-import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -14,8 +12,5 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     Optional<Account> findByCustomerId(String customerId);
 
-//    @Transactional
-//    @Modifying
-//    void deleteByCustomerId(Long customerId);
 
 }

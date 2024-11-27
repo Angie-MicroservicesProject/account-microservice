@@ -1,7 +1,5 @@
 package com.example.ms.ms_account.exception;
 
-
-
 import com.example.ms.ms_account.dto.ErrorResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

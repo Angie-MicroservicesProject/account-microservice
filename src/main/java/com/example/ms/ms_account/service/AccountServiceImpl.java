@@ -25,14 +25,18 @@ public class AccountServiceImpl implements AccountService    {
 
     @Override
     public void createAccount(AccountDto accountDto) {
+
         Account account= AccountMapper.mapToAccount(accountDto, new Account());
+        if (account == null) {
+            throw new IllegalArgumentException("Customer mapping failed.");
+        }
         Optional<Account> optionalAccount=accountRepository.findByCustomerId(accountDto.getAccountNumber());
         if(optionalAccount.isPresent()){
             throw new AccountAlreadyExistsException("Account already registered with given ID "+accountDto.getAccountNumber());
         }
         account.setCreatedAt(LocalDateTime.now());
         account.setCreatedBy("Anonymus");
-        Account savedAccount = accountRepository.save(account);
+        accountRepository.save(account);
 
     }
 
@@ -43,6 +47,9 @@ public class AccountServiceImpl implements AccountService    {
 
     @Override
     public AccountDto getAccount(String id) {
+        if (id == null || id.trim().isEmpty()) {
+            throw new IllegalArgumentException("ID cannot be null or empty");
+        }
         Account account = accountRepository.findByCustomerId(id).orElseThrow(
                 () -> new ResourceNotFoundException("Account", "id ", id)
         );
