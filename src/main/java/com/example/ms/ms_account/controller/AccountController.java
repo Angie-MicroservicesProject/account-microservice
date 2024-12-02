@@ -37,11 +37,15 @@ public class AccountController {
         return accountService.getAllAccounts();
     }
 
+
     @GetMapping("/accounts/{id}")
     public  ResponseEntity<AccountDto> getAccount(@RequestHeader Map<String, String> headers, @PathVariable String id) {
         AccountDto accountDto = accountService.getAccount(id);
         return ResponseEntity.status(HttpStatus.OK).body(accountDto);
     }
+
+
+
 
     @PutMapping("/accounts/{id}")
     public ResponseEntity<ResponseDto> updateAccount(@PathVariable String id, @RequestBody AccountDto accountDto) {
@@ -74,6 +78,45 @@ public class AccountController {
                     .body(new ResponseDto(AccountConstants.STATUS_417, AccountConstants.MESSAGE_417_UPDATE));
         }
     }
+
+    @PutMapping("/accounts/{id}/depositar")
+    public ResponseEntity<ResponseDto> depositAccount(@PathVariable String id, @RequestBody Double monto) {
+        boolean isUpdated = accountService.depositAccount(id, monto);
+
+        if (isUpdated) {
+            ResponseDto responseDto = new ResponseDto("200", "Deposit successful");
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(responseDto);
+        } else {
+            ResponseDto responseDto = new ResponseDto("417", "Failed deposit");
+            return ResponseEntity
+                    .status(HttpStatus.EXPECTATION_FAILED)
+                    .body(responseDto);
+        }
+
+    }
+
+    @PutMapping("/accounts/{id}/retirar")
+    public ResponseEntity<ResponseDto> withdrawalAccount(@PathVariable String id, @RequestBody Double monto) {
+        boolean isUpdated = accountService.withdrawalAccount(id, monto);
+
+        if (isUpdated) {
+            ResponseDto responseDto = new ResponseDto("200", "Withdrawal successful");
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(responseDto);
+        } else {
+            ResponseDto responseDto = new ResponseDto("417", "Failed deposit");
+            return ResponseEntity
+                    .status(HttpStatus.EXPECTATION_FAILED)
+                    .body(responseDto);
+        }
+
+    }
+
+
+
 
 
 

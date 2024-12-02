@@ -9,7 +9,9 @@ import com.example.ms.ms_account.repository.AccountRepository;
 import org.springframework.stereotype.Service;
 import com.example.ms.ms_account.mapper.AccountMapper;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,18 +45,22 @@ public class AccountServiceImpl implements AccountService    {
     @Override
     public List<Account> getAllAccounts() {
         return accountRepository.findAll();
+
     }
+
 
     @Override
     public AccountDto getAccount(String id) {
         if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("ID cannot be null or empty");
         }
-        Account account = accountRepository.findByCustomerId(id).orElseThrow(
+        Account account = accountRepository.findById(Long.parseLong(id)).orElseThrow(
                 () -> new ResourceNotFoundException("Account", "id ", id)
         );
-        return AccountMapper.mapToAccountDto(account, new AccountDto());
+        AccountDto accountDto= AccountMapper.mapToAccountDto(account, new AccountDto());
+        return accountDto;
     }
+
 
     @Override
     public boolean updateAccount(AccountDto accountDto) {
@@ -88,6 +94,36 @@ public class AccountServiceImpl implements AccountService    {
         return true;
     }
 
+    @Override
+    public boolean depositAccount(String id, double monto) {
+
+        Account account = accountRepository.findById(Long.parseLong(id)).orElseThrow(
+            () -> new ResourceNotFoundException("Account", "id ", id)
+    );
+
+        double saldoActual = account.getBalance();
+        account.setBalance(saldoActual + monto);
+        account.setUpdatedAt(LocalDateTime.now());
+        account.setUpdatedBy("Anonymous");
+        accountRepository.save(account);
+
+        return true;
+    }
+
+    @Override
+    public boolean withdrawalAccount(String id, double monto) {
+        Account account = accountRepository.findById(Long.parseLong(id)).orElseThrow(
+                () -> new ResourceNotFoundException("Account", "id ", id)
+        );
+
+        double saldoActual = account.getBalance();
+        account.setBalance(saldoActual - monto);
+        account.setUpdatedAt(LocalDateTime.now());
+        account.setUpdatedBy("Anonymous");
+        accountRepository.save(account);
+
+        return true;
+    }
 
 
 }

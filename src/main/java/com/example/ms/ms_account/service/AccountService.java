@@ -13,6 +13,9 @@ public interface AccountService {
     boolean updateAccount(AccountDto accountDto);
     boolean deleteAccount(String id);
 
+    boolean depositAccount(String id, double monto);
+    boolean withdrawalAccount(String id, double monto);
+
 
 
 }
