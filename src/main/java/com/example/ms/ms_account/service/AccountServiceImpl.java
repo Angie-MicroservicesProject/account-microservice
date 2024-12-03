@@ -117,6 +117,19 @@ public class AccountServiceImpl implements AccountService    {
         );
 
         double saldoActual = account.getBalance();
+
+        if (saldoActual <= 0) {
+            throw new IllegalStateException("Cannot withdraw from an account with a non-positive balance");
+        }
+
+        if (account.getAccountType().equalsIgnoreCase("Savings") && saldoActual - monto < 0) {
+            throw new IllegalStateException("Withdrawal would leave the account with a negative balance");
+        }
+
+        if (account.getAccountType().equalsIgnoreCase("Current") && saldoActual - monto < -500) {
+            throw new IllegalStateException("Overdraft limit exceeded");
+        }
+
         account.setBalance(saldoActual - monto);
         account.setUpdatedAt(LocalDateTime.now());
         account.setUpdatedBy("Anonymous");

@@ -52,7 +52,7 @@ public class AccountController {
         boolean isUpdated = accountService.updateAccount(accountDto);
 
         if (isUpdated) {
-            ResponseDto responseDto = new ResponseDto("200", "Client updated successfully");
+            ResponseDto responseDto = new ResponseDto("200", "Account updated successfully");
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(responseDto);
@@ -114,6 +114,9 @@ public class AccountController {
         }
 
     }
+
+
+
 
 
 

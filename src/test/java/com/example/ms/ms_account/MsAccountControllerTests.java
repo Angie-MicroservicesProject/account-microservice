@@ -38,10 +38,12 @@ class MsAccountControllerTests {
 	@Autowired
 	private ObjectMapper objectMapper;
 
+
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.openMocks(this);
 		mockMvc = MockMvcBuilders.standaloneSetup(accountController).build();
+		objectMapper = new ObjectMapper();
 	}
 
 	@Test
@@ -107,12 +109,9 @@ class MsAccountControllerTests {
 						.contentType("application/json")
 						.content("{\"accountNumber\":\"123456789\",\"balance\":2000.0,\"accountType\":\"Checking\",\"customerId\":\"CUST001\"}"))
 				.andExpect(status().isOk())
-//				.andExpect(jsonPath("$.statusCode").value("200"))
-//				.andExpect(jsonPath("$.statusMsg").value("Account updated successfully"))
+				.andExpect(jsonPath("$.statusCode").value("200"))
+				.andExpect(jsonPath("$.statusMsg").value("Account updated successfully"))
 				.andReturn();
-
-		// Print response for debugging
-		System.out.println(result.getResponse().getContentAsString());
 
 		verify(accountService, times(1)).updateAccount(accountDto);
 	}
@@ -135,5 +134,76 @@ class MsAccountControllerTests {
 	}
 
 
+	@Test
+	void testDepositAccountSuccess() throws Exception {
+		// Arrange
+		String accountId = "123";
+		Double amount = 100.0;
+		when(accountService.depositAccount(accountId, amount)).thenReturn(true);
 
+		// Act & Assert
+		mockMvc.perform(put("/api/accounts/{id}/depositar", accountId)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(amount)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.statusCode").value("200"))
+				.andExpect(jsonPath("$.statusMsg").value("Deposit successful"));
+
+		verify(accountService, times(1)).depositAccount(accountId, amount);
+	}
+
+	@Test
+	void testDepositAccountFailure() throws Exception {
+		// Arrange
+		String accountId = "123";
+		Double amount = 100.0;
+		when(accountService.depositAccount(accountId, amount)).thenReturn(false);
+
+		// Act & Assert
+		mockMvc.perform(put("/api/accounts/{id}/depositar", accountId)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(amount)))
+				.andExpect(status().isExpectationFailed())
+				.andExpect(jsonPath("$.statusCode").value("417"))
+				.andExpect(jsonPath("$.statusMsg").value("Failed deposit"));
+
+		verify(accountService, times(1)).depositAccount(accountId, amount);
+	}
+
+
+	@Test
+	void testWithdrawalAccountSuccess() throws Exception {
+		// Arrange
+		String accountId = "123";
+		Double amount = 50.0;
+		when(accountService.withdrawalAccount(accountId, amount)).thenReturn(true);
+
+		// Act & Assert
+		mockMvc.perform(put("/api/accounts/{id}/retirar", accountId)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(amount)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.statusCode").value("200"))
+				.andExpect(jsonPath("$.statusMsg").value("Withdrawal successful"));
+
+		verify(accountService, times(1)).withdrawalAccount(accountId, amount);
+	}
+
+	@Test
+	void testWithdrawalAccountFailure() throws Exception {
+		// Arrange
+		String accountId = "123";
+		Double amount = 50.0;
+		when(accountService.withdrawalAccount(accountId, amount)).thenReturn(false);
+
+		// Act & Assert
+		mockMvc.perform(put("/api/accounts/{id}/retirar", accountId)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(amount)))
+				.andExpect(status().isExpectationFailed())
+				.andExpect(jsonPath("$.statusCode").value("417"))
+				.andExpect(jsonPath("$.statusMsg").value("Failed deposit"));
+
+		verify(accountService, times(1)).withdrawalAccount(accountId, amount);
+	}
 }
